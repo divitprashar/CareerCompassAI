@@ -1,0 +1,9 @@
+field_id,field_name,description,career_examples,popular_courses
+F001,Computer Science,"Programming, AI, data, software development","Software Developer, Data Scientist, AI Engineer","Introduction to Programming, Machine Learning, Web Development"
+F002,Business,"Management, marketing, finance, entrepreneurship","Business Analyst, Marketing Manager, Financial Analyst","Marketing Management, Financial Management, Business Analytics"
+F003,Psychology,"Mental health, counseling, behavior, research","Clinical Psychologist, School Counselor, HR Manager","Clinical Psychology, Organizational Behavior, Research Methods"
+F004,Engineering,"Mechanical, electrical, civil, robotics","Mechanical Engineer, Robotics Engineer, Civil Engineer","Mechanical Design, Electrical Circuits, Robotics and Automation"
+F005,Science,"Data science, biotech, environmental, statistics","Data Scientist, Biotechnologist, Environmental Consultant","Data Science, Biotechnology, Statistics"
+F006,Arts,"Design, media, communication, UX","UX Designer, Graphic Designer, Journalist","UX/UI Design, Graphic Design, Communication Studies"
+F007,Law,"Legal practice, corporate law, policy","Lawyer, Legal Consultant, Policy Advisor","Law and Legal Studies"
+F008,Healthcare,"Nursing, hospital management, public health","Registered Nurse, Hospital Administrator, Public Health Specialist","Nursing Fundamentals, Healthcare Management, Health Psychology"
