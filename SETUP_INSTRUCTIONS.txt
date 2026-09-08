@@ -1,0 +1,278 @@
+============================================================
+  Career Compass AI — Setup Instructions
+  (Share this file along with the ZIP)
+============================================================
+
+Hi,
+
+Please find attached the Career Compass AI application — an offline
+AI-powered career counselor for graduation course recommendations.
+
+Follow the steps below to set it up on your laptop.
+
+------------------------------------------------------------
+BEFORE YOU BEGIN
+------------------------------------------------------------
+
+You will need:
+  - A Windows 10 or Windows 11 laptop
+  - At least 8 GB of free disk space
+  - At least 4 GB of RAM
+  - Internet connection (only during setup, not after)
+  - Around 20-30 minutes for the one-time setup
+
+------------------------------------------------------------
+STEP 1 — Install Python
+------------------------------------------------------------
+
+1. Open your browser and go to:
+   https://www.python.org/downloads/
+
+2. Click the big yellow "Download Python 3.x.x" button
+
+3. Run the downloaded installer (.exe file)
+
+4. IMPORTANT: On the first screen of the installer,
+   check the box that says:
+   "Add Python to PATH"  ✓
+   (This is at the bottom of the installer window)
+
+5. Click "Install Now"
+
+6. Wait for installation to complete, then click Close
+
+To verify Python installed correctly:
+  - Press Windows key + R
+  - Type: cmd  and press Enter
+  - In the black window, type: python --version
+  - You should see something like: Python 3.11.x
+  - If you see a version number, Python is installed correctly
+
+------------------------------------------------------------
+STEP 2 — Install Ollama (Local AI Engine)
+------------------------------------------------------------
+
+1. Open your browser and go to:
+   https://ollama.com/download
+
+2. Click "Download for Windows"
+
+3. Run the downloaded installer (OllamaSetup.exe)
+
+4. Follow the on-screen instructions (just click Next/Install)
+
+5. Ollama will install silently in the background
+
+To verify Ollama installed correctly:
+  - Press Windows key + R
+  - Type: cmd  and press Enter
+  - Type: ollama --version
+  - You should see a version number
+
+------------------------------------------------------------
+STEP 3 — Extract the App
+------------------------------------------------------------
+
+1. Locate the ZIP file you received:
+   CareerCompassAI.zip  (or career-counselor-app.zip)
+
+2. Right-click the ZIP file
+
+3. Click "Extract All..."
+
+4. Choose a location (e.g., your Desktop or C:\CareerCompassAI)
+
+5. Click "Extract"
+
+6. Open the extracted folder — you should see these files:
+     setup.bat
+     run.bat
+     app.py
+     requirements.txt
+     README.txt
+     data\ folder
+     templates\ folder
+
+------------------------------------------------------------
+STEP 4 — Run Setup (One Time Only)
+------------------------------------------------------------
+
+1. Inside the extracted folder, double-click:
+   setup.bat
+
+2. A black window will open — this is normal
+
+3. It will automatically:
+   - Check that Python is installed
+   - Install the required Python packages (Flask etc.)
+   - Check that Ollama is installed
+   - Download the AI model (~2 GB) — this may take
+     5 to 15 minutes depending on your internet speed
+
+4. You will see progress messages on screen
+
+5. When you see "Setup Complete!" — setup is done!
+
+NOTE: If Windows asks "Do you want to allow this app to
+make changes?" — click Yes.
+
+NOTE: If you see a Windows Defender / SmartScreen warning,
+click "More info" then "Run anyway" — this is safe.
+
+------------------------------------------------------------
+STEP 5 — Launch the App
+------------------------------------------------------------
+
+1. Double-click:  run.bat
+
+2. A black window will open (do not close it)
+
+3. Your browser will open automatically at:
+   http://localhost:5000
+
+4. The app is now running!
+
+------------------------------------------------------------
+USING THE APP
+------------------------------------------------------------
+
+The app has three pages:
+
+  HOME PAGE (http://localhost:5000)
+  - Overview of what the app does
+  - Browse careers by academic field
+  - Click any field card to start a focused chat
+
+  HOW IT WORKS (http://localhost:5000/how-it-works)
+  - Full explanation of the technology behind the app
+  - How recommendations are generated
+  - Frequently asked questions
+
+  CAREER CHAT (http://localhost:5000/chat)
+  - Type naturally with the AI counselor
+  - Fill in the profile form on the left sidebar for
+    more accurate recommendations
+  - Use the quick-prompt buttons to get started fast
+  - Click "Export" to save your conversation as a text file
+
+TIPS FOR BEST RESULTS:
+  - Fill in the profile sidebar (name, background, interests)
+  - Be specific about your interests
+    e.g. "I like coding, math, problem solving"
+    rather than just "technology"
+  - Ask follow-up questions like:
+    "What salary does a Data Scientist earn?"
+    "Which courses do I need for Cybersecurity?"
+    "Compare Software Developer vs Data Scientist"
+
+------------------------------------------------------------
+DAILY USE (AFTER SETUP)
+------------------------------------------------------------
+
+Every time you want to use the app:
+  1. Double-click run.bat
+  2. Browser opens automatically
+  3. Start chatting
+
+No internet needed. Everything runs on your laptop.
+
+------------------------------------------------------------
+STOPPING THE APP
+------------------------------------------------------------
+
+1. In the black command window, press: Ctrl + C
+2. Close the browser tab
+
+Or simply close the black command window.
+
+------------------------------------------------------------
+TROUBLESHOOTING
+------------------------------------------------------------
+
+PROBLEM: "AI Offline" shown in the chat
+SOLUTION:
+  - Open Command Prompt (Windows + R, type cmd)
+  - Type: ollama serve
+  - Keep that window open, then refresh the browser
+
+PROBLEM: setup.bat says Python is not found
+SOLUTION:
+  - Reinstall Python from python.org
+  - Make sure you checked "Add Python to PATH"
+  - Restart your laptop and try again
+
+PROBLEM: Browser does not open automatically
+SOLUTION:
+  - Open your browser manually
+  - Type in the address bar: http://localhost:5000
+  - Press Enter
+
+PROBLEM: AI responses are very slow (more than 30 seconds)
+SOLUTION:
+  - This is normal on older laptops (AI runs on CPU)
+  - Typical response time: 5–20 seconds
+  - Just wait — it will respond
+
+PROBLEM: Windows Defender blocks the .bat file
+SOLUTION:
+  - Right-click the .bat file
+  - Click "Properties"
+  - At the bottom, check "Unblock"
+  - Click OK, then run again
+
+PROBLEM: Port 5000 already in use
+SOLUTION:
+  - Open app.py in Notepad
+  - Find the last line: port=5000
+  - Change to: port=5001
+  - Save, and access the app at http://localhost:5001
+
+------------------------------------------------------------
+SYSTEM REQUIREMENTS
+------------------------------------------------------------
+
+  Operating System : Windows 10 or Windows 11
+  RAM              : 4 GB minimum (8 GB recommended)
+  Disk Space       : 5 GB free (for the AI model)
+  Browser          : Chrome, Edge, or Firefox
+  Internet         : Only needed during setup (Step 4)
+
+------------------------------------------------------------
+PRIVACY & SECURITY
+------------------------------------------------------------
+
+  - The app runs 100% on your laptop
+  - No data is sent to the internet
+  - No account or login required
+  - Your conversations are stored only on your laptop
+    in the flask_sessions folder
+  - Conversations are cleared when you reset the chat
+
+------------------------------------------------------------
+CONTENTS OF THE ZIP FILE
+------------------------------------------------------------
+
+  app.py              Main application
+  setup.bat           One-time setup script
+  run.bat             Daily launcher
+  requirements.txt    Python package list
+  README.txt          Technical documentation
+  SETUP_INSTRUCTIONS.txt  This file
+  data/
+    courses.csv       40+ graduation courses
+    careers.csv       30+ career paths with salary data
+    fields.csv        8 academic fields
+  templates/
+    index.html        Home page
+    how_it_works.html Explanation page
+    chat.html         Chat interface
+    base.html         Shared layout
+
+------------------------------------------------------------
+
+For any issues, contact the person who shared this with you.
+
+============================================================
+  Career Compass AI — Offline Career Counseling App
+  Works without internet after first-time setup
+============================================================

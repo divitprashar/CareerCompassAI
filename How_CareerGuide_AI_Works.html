@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>How Career Compass AI Works — Technical Overview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f4ff;
+      color: #1e1e2e;
+      line-height: 1.7;
+    }
+
+    /* COVER */
+    .cover {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      text-align: center;
+      padding: 60px 20px 50px;
+    }
+    .cover .emoji { font-size: 5rem; margin-bottom: 16px; }
+    .cover h1 { font-size: 2.6rem; font-weight: 800; margin-bottom: 10px; }
+    .cover .subtitle {
+      font-size: 1.15rem;
+      opacity: 0.85;
+      max-width: 600px;
+      margin: 0 auto 20px;
+    }
+    .cover .tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 20px;
+      padding: 6px 18px;
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* LAYOUT */
+    .page { max-width: 860px; margin: 0 auto; padding: 40px 20px 60px; }
+
+    /* SECTION TITLES */
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #4f46e5;
+      margin: 48px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 3px;
+      background: linear-gradient(to right, #4f46e5, transparent);
+      border-radius: 2px;
+      margin-left: 10px;
+    }
+    .section-intro {
+      font-size: 1rem;
+      color: #4a4a6a;
+      margin-bottom: 20px;
+    }
+
+    /* CARDS */
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(79,70,229,0.08);
+      border-left: 5px solid #4f46e5;
+    }
+    .card h3 { font-size: 1.1rem; margin-bottom: 8px; color: #1e1e2e; }
+    .card p { font-size: 0.95rem; color: #4a4a6a; }
+    .card.green  { border-left-color: #10b981; }
+    .card.yellow { border-left-color: #f59e0b; }
+    .card.pink   { border-left-color: #ec4899; }
+    .card.cyan   { border-left-color: #06b6d4; }
+
+    /* ANALOGY BOX */
+    .analogy {
+      background: #fffbeb;
+      border: 2px dashed #f59e0b;
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin: 16px 0;
+      font-size: 0.95rem;
+      color: #78350f;
+    }
+    .analogy strong { color: #b45309; }
+    .analogy .label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: #d97706;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    /* STEP FLOW */
+    .steps { display: flex; flex-direction: column; gap: 0; margin: 20px 0; }
+    .step-row { display: flex; align-items: flex-start; gap: 16px; }
+    .step-left { display: flex; flex-direction: column; align-items: center; }
+    .step-circle {
+      width: 44px; height: 44px; min-width: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1.1rem;
+    }
+    .step-line {
+      width: 3px;
+      flex: 1;
+      min-height: 30px;
+      background: linear-gradient(to bottom, #4f46e5, transparent);
+      margin: 4px 0;
+    }
+    .step-row:last-child .step-line { display: none; }
+    .step-content {
+      background: white;
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      flex: 1;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .step-content h4 { font-size: 1rem; margin-bottom: 5px; color: #1e1e2e; }
+    .step-content p { font-size: 0.9rem; color: #4a4a6a; }
+
+    /* DIAGRAM */
+    .diagram {
+      background: #1e1e2e;
+      color: #e2e8f0;
+      border-radius: 16px;
+      padding: 24px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.88rem;
+      line-height: 2.2;
+      overflow-x: auto;
+      margin: 20px 0;
+    }
+    .diagram .c1 { color: #a5b4fc; font-weight: bold; }
+    .diagram .c2 { color: #6ee7b7; font-weight: bold; }
+    .diagram .c3 { color: #fcd34d; font-weight: bold; }
+    .diagram .arrow { color: #f472b6; }
+
+    /* FACT BOXES */
+    .fact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin: 20px 0; }
+    .fact-box {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    }
+    .fact-box .fact-icon { font-size: 2rem; margin-bottom: 8px; }
+    .fact-box .fact-num { font-size: 1.8rem; font-weight: 800; color: #4f46e5; }
+    .fact-box .fact-label { font-size: 0.82rem; color: #6b7280; margin-top: 4px; }
+
+    /* QUIZ */
+    .quiz-box {
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border: 2px solid #86efac;
+      border-radius: 16px;
+      padding: 24px;
+      margin: 20px 0;
+    }
+    .quiz-box h4 { color: #166534; margin-bottom: 14px; font-size: 1rem; }
+    .quiz-q { margin-bottom: 14px; }
+    .quiz-q p { font-size: 0.92rem; font-weight: 600; color: #1e1e2e; margin-bottom: 6px; }
+    .quiz-q .answer {
+      background: white;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.88rem;
+      color: #166534;
+      cursor: pointer;
+      border: 1px solid #86efac;
+      display: inline-block;
+      margin-top: 4px;
+    }
+    .quiz-q .answer:hover { background: #f0fdf4; }
+
+    /* GLOSSARY */
+    .glossary { margin: 16px 0; }
+    .gloss-item {
+      background: white;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+    }
+    .gloss-term {
+      font-weight: 700;
+      color: #4f46e5;
+      min-width: 140px;
+      font-size: 0.9rem;
+    }
+    .gloss-def { font-size: 0.88rem; color: #4a4a6a; }
+
+    /* HIGHLIGHT BOX */
+    .highlight-box {
+      background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+      border: 2px solid #c7d2fe;
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin: 20px 0;
+      font-size: 0.95rem;
+      color: #3730a3;
+    }
+    .highlight-box strong { color: #1e1b4b; }
+
+    /* TABLE */
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+    th { background: #4f46e5; color: white; padding: 12px 16px; text-align: left; font-size: 0.88rem; }
+    td { padding: 11px 16px; font-size: 0.88rem; color: #374151; border-bottom: 1px solid #f3f4f6; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafafa; }
+
+    /* FOOTER */
+    footer {
+      background: #1e1e2e;
+      color: #94a3b8;
+      text-align: center;
+      padding: 30px 20px;
+      font-size: 0.85rem;
+    }
+    footer strong { color: #a5b4fc; }
+
+    .fact-num-red   { color: #ef4444; }
+    .fact-num-green { color: #10b981; }
+
+    @media print {
+      body { background: white; }
+      .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="emoji">🎓</div>
+  <h1>How Career Compass AI Works</h1>
+  <p class="subtitle">A comprehensive technical overview of the AI-powered career counseling system — architecture, data, and training.</p>
+  <span class="tag">📘 Technical Overview Document</span>
+</div>
+
+<div class="page">
+
+  <!-- WHAT IS IT -->
+  <div class="section-title">🤔 What is Career Compass AI?</div>
+  <p class="section-intro">An overview of what this system does and the problem it solves.</p>
+
+  <div class="card">
+    <h3>An offline AI-powered career counseling system</h3>
+    <p>Career Compass AI is a locally-deployed application that conducts structured, conversational career assessments and returns personalized graduation course and career path recommendations. It combines a skills-matching recommendation engine with a locally-running large language model (LLM) to produce natural, context-aware guidance — without any cloud dependency.</p>
+  </div>
+
+  <div class="analogy">
+    <span class="label">💡 CORE PURPOSE</span>
+    The system replicates the function of a human career counselor — gathering information about a student's academic background, interests, and goals, then mapping those inputs to relevant course-career pathways using structured data and AI-generated narrative explanation.
+  </div>
+
+  <div class="fact-grid">
+    <div class="fact-box">
+      <div class="fact-icon">💻</div>
+      <div class="fact-num">40+</div>
+      <div class="fact-label">Graduation Courses</div>
+    </div>
+    <div class="fact-box">
+      <div class="fact-icon">🎯</div>
+      <div class="fact-num">30+</div>
+      <div class="fact-label">Career Paths</div>
+    </div>
+    <div class="fact-box">
+      <div class="fact-icon">📡</div>
+      <div class="fact-num">0</div>
+      <div class="fact-label">Internet Needed</div>
+    </div>
+    <div class="fact-box">
+      <div class="fact-icon">🔒</div>
+      <div class="fact-num">100%</div>
+      <div class="fact-label">Private & Offline</div>
+    </div>
+  </div>
+
+
+  <!-- THE BIG PICTURE -->
+  <div class="section-title">🗺️ System Architecture</div>
+  <p class="section-intro">How all components of the application interact at runtime:</p>
+
+  <div class="diagram">
+    &nbsp;&nbsp;<span class="c1">[ YOU — typing in the chat ]</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="arrow">↓  your message</span><br>
+    &nbsp;&nbsp;<span class="c2">[ FLASK SERVER — the middleman running on your laptop ]</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="arrow">↓  looks up matching careers</span><br>
+    &nbsp;&nbsp;<span class="c3">[ DATASET — list of courses, careers, salaries ]</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="arrow">↓  passes results to AI</span><br>
+    &nbsp;&nbsp;<span class="c1">[ OLLAMA AI — the brain, thinks and writes a reply ]</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="arrow">↓  sends reply back</span><br>
+    &nbsp;&nbsp;<span class="c2">[ YOU — reading the AI's personalized advice ]</span>
+  </div>
+
+  <div class="highlight-box">
+    🔑 <strong>Key idea:</strong> Nothing leaves your laptop. The AI thinks, the data is stored, and the reply is shown — all on your own computer. No internet needed after setup!
+  </div>
+
+
+  <!-- 3 MAIN PARTS -->
+  <div class="section-title">🧩 The 3 Core Components</div>
+  <p class="section-intro">The application is composed of three integrated layers:</p>
+
+  <div class="card">
+    <h3>🌐 Component 1 — Web Layer (Flask)</h3>
+    <p>Flask is a lightweight Python web framework that serves the application's frontend (HTML pages) and exposes REST API endpoints for the chat interface, profile updates, and recommendation queries. It handles session management via server-side filesystem sessions and routes all requests between the browser and the backend logic.</p>
+  </div>
+
+  <div class="card green">
+    <h3>📊 Component 2 — Data Layer (CSV Datasets)</h3>
+    <p>Three structured CSV files stored locally contain the domain knowledge: course definitions, career profiles with salary and growth data, and academic field taxonomies. At startup, all data is loaded into memory as Python dictionaries for fast lookup. The recommendation engine performs keyword-overlap scoring against this dataset at query time.</p>
+  </div>
+
+  <div class="card yellow">
+    <h3>🤖 Component 3 — AI Layer (Ollama + Llama 3.2)</h3>
+    <p>Ollama is an open-source runtime that manages local LLM inference. It exposes a local REST API at <code>localhost:11434</code> that the Flask backend calls with each user message. The Llama 3.2 3B model processes the full conversation history plus injected recommendation context and returns a natural language response. All inference runs on the local CPU — no external API calls are made.</p>
+  </div>
+
+
+  <!-- STEP BY STEP -->
+  <div class="section-title">👣 Request Lifecycle — Step by Step</div>
+  <p class="section-intro">The complete flow from user input to AI response:</p>
+
+  <div class="steps">
+    <div class="step-row">
+      <div class="step-left">
+        <div class="step-circle">1</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <h4>User submits a message via the chat interface</h4>
+        <p>The browser sends a POST request to <code>/api/chat</code> with the message payload in JSON format. The user's profile data (interests, field, background) stored in the sidebar form is also synced to the server session via <code>/api/update-profile</code>.</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-left">
+        <div class="step-circle">2</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <h4>Flask API endpoint processes the request</h4>
+        <p>The <code>/api/chat</code> route handler retrieves the current session (conversation history + user profile), appends the new user message to the history, and passes the full context to the recommendation engine and LLM pipeline.</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-left">
+        <div class="step-circle">3</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <h4>Recommendation engine scores and ranks careers</h4>
+        <p>The user's interests are tokenized and matched against each career's <code>required_skills</code> field using substring overlap scoring. Careers are ranked by match count and the top 5 are selected. For each matched career, its linked course IDs are resolved to full course records from the courses dataset.</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-left">
+        <div class="step-circle">4</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <h4>Recommendation context is injected into the system prompt</h4>
+        <p>The top 5 careers, their salaries, growth ratings, and recommended courses are serialized into a structured text block and appended to the LLM's system prompt. This grounds the model's response in factual, domain-specific data rather than relying solely on its pre-trained knowledge.</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-left">
+        <div class="step-circle">5</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <h4>Llama 3.2 generates a response via Ollama inference</h4>
+        <p>The full message array (system prompt + conversation history) is sent to Ollama's <code>/api/chat</code> endpoint at <code>localhost:11434</code>. The model runs inference locally at temperature 0.7 with a 512-token output limit and returns a structured JSON response containing the assistant's message.</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-left">
+        <div class="step-circle">6</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-content">
+        <h4>Response is returned and conversation history updated</h4>
+        <p>The assistant's reply is appended to the session's message history and returned to the browser as JSON. The frontend renders it in the chat UI. On the next message, the full updated history is sent again — enabling multi-turn contextual conversation throughout the session.</p>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- HOW MATCHING WORKS -->
+  <div class="section-title">🎯 Recommendation Algorithm — Detail</div>
+  <p class="section-intro">How the skills-interest matching engine scores and ranks career paths:</p>
+
+  <div class="card pink">
+    <h3>Keyword Overlap Scoring (Bag-of-Words Matching)</h3>
+    <p>Each career record contains a comma-separated <code>required_skills</code> field. The user's stated interests are split into tokens and each token is tested for substring containment against each skill token in every career record. The score for a career equals the count of interest tokens that match at least one skill. Careers are sorted descending by score; top 5 are returned.</p>
+  </div>
+
+  <div class="analogy">
+    <span class="label">💡 SCORING EXAMPLE</span>
+    User input interests: <strong>"Python, data, math"</strong><br><br>
+    Scoring against careers:<br>
+    → <strong>Data Scientist</strong> — skills: Python, ML, Statistics, SQL → <em>2 matches (Python, data/Statistics) → Score: 2</em><br>
+    → <strong>Web Developer</strong> — skills: HTML, CSS, JavaScript → <em>0 matches → Score: 0</em><br>
+    → <strong>Business Analyst</strong> — skills: Excel, SQL, Statistics, Communication → <em>1 match (Statistics≈math) → Score: 1</em><br><br>
+    <strong>Result: Data Scientist ranked first</strong> with the highest overlap score.
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Your Interest</th><th>Matched Career</th><th>Match Score</th><th>Avg Salary</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Python, data, math</td><td>Data Scientist</td><td>⭐⭐⭐ High</td><td>₹12,00,000/yr</td></tr>
+      <tr><td>coding, problem solving</td><td>Software Developer</td><td>⭐⭐⭐ High</td><td>₹8,00,000/yr</td></tr>
+      <tr><td>design, creativity</td><td>UX Designer</td><td>⭐⭐ Medium</td><td>₹7,50,000/yr</td></tr>
+      <tr><td>people, helping others</td><td>Clinical Psychologist</td><td>⭐⭐ Medium</td><td>₹5,00,000/yr</td></tr>
+      <tr><td>finance, numbers</td><td>Financial Analyst</td><td>⭐⭐⭐ High</td><td>₹9,00,000/yr</td></tr>
+    </tbody>
+  </table>
+
+
+  <!-- WHAT IS AN LLM -->
+  <div class="section-title">🧠 The AI Model — Llama 3.2 by Meta</div>
+  <p class="section-intro">Technical profile of the language model powering the chat interface:</p>
+
+  <div class="card cyan">
+    <h3>Model: Llama 3.2 3B (Meta AI, 2024)</h3>
+    <p>Llama 3.2 is Meta's open-weight large language model released in September 2024. The 3B variant has <strong>3.21 billion parameters</strong>, uses a transformer decoder architecture with grouped query attention (GQA), and supports a 128,000-token context window. It was trained using supervised fine-tuning (SFT) and reinforcement learning from human feedback (RLHF).</p>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Specification</th><th>Value</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Model family</td><td>Llama 3.2</td></tr>
+      <tr><td>Developer</td><td>Meta AI</td></tr>
+      <tr><td>Release date</td><td>September 2024</td></tr>
+      <tr><td>Parameter count</td><td>3.21 billion</td></tr>
+      <tr><td>Architecture</td><td>Transformer Decoder (auto-regressive)</td></tr>
+      <tr><td>Attention mechanism</td><td>Grouped Query Attention (GQA)</td></tr>
+      <tr><td>Context window</td><td>128,000 tokens</td></tr>
+      <tr><td>Vocabulary size</td><td>128,256 tokens (tiktoken BPE)</td></tr>
+      <tr><td>Training precision</td><td>BFloat16</td></tr>
+      <tr><td>Quantized size (Q4)</td><td>~2.0 GB on disk</td></tr>
+      <tr><td>License</td><td>Llama 3.2 Community License (free for most uses)</td></tr>
+      <tr><td>Inference runtime</td><td>Ollama (CPU and GPU supported)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card">
+    <h3>Why does it run offline after download?</h3>
+    <p>During training, the model's learned knowledge is encoded as billions of numerical weights stored in a file (~2GB quantized). Once downloaded to your laptop, Ollama loads these weights into RAM and runs the model's inference computations locally on the CPU. No internet connection is needed because all the model's knowledge is embedded in those weight files — the model does not "look up" answers online.</p>
+  </div>
+
+  <!-- TRAINING DATA SECTION -->
+  <div class="section-title">📚 Llama 3.2 Training Data — What It Was Trained On</div>
+  <p class="section-intro">The model's knowledge comes from a massive pre-training corpus. Below is a breakdown of the publicly disclosed training data sources, volume, and composition:</p>
+
+  <div class="card">
+    <h3>Total Pre-Training Data Volume</h3>
+    <p>Llama 3.2 3B was trained on approximately <strong>9 trillion tokens</strong> of text data — equivalent to roughly 6.75 trillion words, or the content of approximately <strong>45 million books</strong>. This is the total corpus used across the Llama 3.x training runs; the 3B model uses a curated subset of this data optimized for the smaller model size.</p>
+  </div>
+
+  <div class="fact-grid">
+    <div class="fact-box">
+      <div class="fact-icon">📄</div>
+      <div class="fact-num">9T</div>
+      <div class="fact-label">Tokens trained on</div>
+    </div>
+    <div class="fact-box">
+      <div class="fact-icon">📚</div>
+      <div class="fact-num">~45M</div>
+      <div class="fact-label">Book equivalents</div>
+    </div>
+    <div class="fact-box">
+      <div class="fact-icon">🌐</div>
+      <div class="fact-num">50+</div>
+      <div class="fact-label">Languages covered</div>
+    </div>
+    <div class="fact-box">
+      <div class="fact-icon">📅</div>
+      <div class="fact-num">2024</div>
+      <div class="fact-label">Knowledge cutoff</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Data Source Category</th><th>Description</th><th>Approx. Share</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Web Crawl (CommonCrawl)</strong></td>
+        <td>Filtered snapshots of billions of public web pages — news sites, blogs, forums, educational content, documentation. Heavily filtered for quality using classifier-based deduplication and heuristic cleaning.</td>
+        <td>~65–70%</td>
+      </tr>
+      <tr>
+        <td><strong>Wikipedia</strong></td>
+        <td>Full text of Wikipedia in multiple languages (primarily English). Covers encyclopedic knowledge across science, history, geography, technology, medicine, law, culture, and more.</td>
+        <td>~4–5%</td>
+      </tr>
+      <tr>
+        <td><strong>Books / Long-Form Text</strong></td>
+        <td>Digitized books including fiction, non-fiction, academic textbooks, and reference works. Sources include Project Gutenberg (70,000+ public domain books), and other curated book corpora. Contributes deep reasoning and narrative understanding.</td>
+        <td>~4–5%</td>
+      </tr>
+      <tr>
+        <td><strong>Academic Papers (ArXiv, PubMed, Semantic Scholar)</strong></td>
+        <td>Peer-reviewed scientific papers across computer science, mathematics, physics, biology, chemistry, medicine, and engineering. Over 2 million papers from ArXiv alone; PubMed covers 35+ million biomedical citations.</td>
+        <td>~2–3%</td>
+      </tr>
+      <tr>
+        <td><strong>Code Repositories (GitHub, Stack Overflow)</strong></td>
+        <td>Open-source code from GitHub across 40+ programming languages (Python, Java, C++, JavaScript, Go, Rust, etc.) and developer Q&A from Stack Overflow. Enables code generation and technical reasoning.</td>
+        <td>~8–10%</td>
+      </tr>
+      <tr>
+        <td><strong>News Articles</strong></td>
+        <td>Curated news content from thousands of publications worldwide. Covers current events, business, science, politics, and international affairs up to the training cutoff date.</td>
+        <td>~3–4%</td>
+      </tr>
+      <tr>
+        <td><strong>Multilingual Web Text</strong></td>
+        <td>Non-English web content covering 50+ languages including German, French, Spanish, Italian, Portuguese, Hindi, Japanese, Korean, Chinese, Arabic, and more.</td>
+        <td>~5–8%</td>
+      </tr>
+      <tr>
+        <td><strong>Synthetic Data (Meta-generated)</strong></td>
+        <td>High-quality synthetic conversations, reasoning chains, and instruction-following examples generated using larger Llama models (Llama 3.1 405B). Used specifically for fine-tuning alignment, helpfulness, and safety behaviour.</td>
+        <td>Undisclosed</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="highlight-box">
+    📌 <strong>Note on transparency:</strong> Meta has not publicly released the exact dataset composition percentages for Llama 3.2. The shares above are estimates based on Meta's published Llama 3 technical report, the Llama 3.2 model card, and independent analysis by the research community. The broad categories and sources are confirmed; the exact proportions are approximate.
+  </div>
+
+  <div class="section-title">📖 Specific Notable Training Sources</div>
+  <p class="section-intro">Key named datasets and corpora that are publicly confirmed or widely reported as part of the Llama 3.x training pipeline:</p>
+
+  <table>
+    <thead>
+      <tr><th>Dataset / Source</th><th>Type</th><th>Scale</th><th>What It Contributed</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>CommonCrawl (CC-Main)</strong></td><td>Web crawl</td><td>Petabytes raw; filtered to ~trillions of tokens</td><td>Broad world knowledge, language diversity, factual content</td></tr>
+      <tr><td><strong>Wikipedia (EN + multilingual)</strong></td><td>Encyclopedia</td><td>~20GB text; 6.7M+ English articles</td><td>Factual accuracy, structured knowledge, definitions</td></tr>
+      <tr><td><strong>Project Gutenberg</strong></td><td>Books</td><td>70,000+ books, ~60GB</td><td>Literary language, long-form reasoning, pre-1927 published works</td></tr>
+      <tr><td><strong>Books3 / The Pile</strong></td><td>Books corpus</td><td>~100GB, ~200,000 books</td><td>Fiction and non-fiction narrative, academic writing style</td></tr>
+      <tr><td><strong>ArXiv</strong></td><td>Academic papers</td><td>2M+ papers, ~270GB</td><td>Scientific and mathematical reasoning, technical terminology</td></tr>
+      <tr><td><strong>PubMed Central</strong></td><td>Biomedical papers</td><td>4M+ full-text articles</td><td>Medical and biological knowledge</td></tr>
+      <tr><td><strong>GitHub (open-source code)</strong></td><td>Source code</td><td>Hundreds of GB across 40+ languages</td><td>Code generation, debugging, software concepts</td></tr>
+      <tr><td><strong>Stack Overflow / Stack Exchange</strong></td><td>Q&A forums</td><td>Millions of Q&A pairs</td><td>Technical problem-solving, developer knowledge</td></tr>
+      <tr><td><strong>C4 (Colossal Clean Crawled Corpus)</strong></td><td>Filtered web</td><td>~750GB</td><td>Clean English web text, general knowledge</td></tr>
+      <tr><td><strong>OpenWebText</strong></td><td>Web text</td><td>~38GB</td><td>High-quality web content (Reddit-upvoted links)</td></tr>
+      <tr><td><strong>RefinedWeb</strong></td><td>Filtered web crawl</td><td>~5TB</td><td>Quality-filtered CommonCrawl derivative</td></tr>
+      <tr><td><strong>DM Mathematics</strong></td><td>Math problems</td><td>Millions of problems</td><td>Mathematical reasoning, algebra, calculus</td></tr>
+      <tr><td><strong>Europarl</strong></td><td>Parliamentary records</td><td>~60M sentences, 21 EU languages</td><td>Multilingual alignment, formal language</td></tr>
+      <tr><td><strong>CC-News</strong></td><td>News articles</td><td>~76GB, 63M articles</td><td>Current events knowledge, journalistic writing</td></tr>
+      <tr><td><strong>Synthetic SFT data (Meta)</strong></td><td>AI-generated</td><td>Millions of examples</td><td>Instruction following, conversation, safety alignment</td></tr>
+    </tbody>
+  </table>
+
+  <div class="analogy">
+    <span class="label">💡 SCALE IN PERSPECTIVE</span>
+    9 trillion tokens is roughly equivalent to reading every English Wikipedia article <strong>6,000 times over</strong>, or reading a new book every minute for <strong>85 years without stopping</strong>. This breadth of training is why the model can discuss careers, salary trends, educational pathways, and give coherent advice across dozens of fields.
+  </div>
+
+  <div class="card green">
+    <h3>What this means for career counseling quality</h3>
+    <p>Because the model was trained on academic papers, Wikipedia, educational content, career forums, news, and professional Q&A sites, it has broad background knowledge on occupations, industries, educational requirements, salary trends, and skill demands. The app harnesses this knowledge and grounds it further with the local CSV dataset to produce recommendations that are both conversationally natural and factually anchored.</p>
+  </div>
+
+
+  <!-- THE DATA -->
+  <div class="section-title">📁 The Data — Where Does the Information Come From?</div>
+  <p class="section-intro">The app uses three simple spreadsheet files saved on your laptop.</p>
+
+  <table>
+    <thead>
+      <tr><th>File Name</th><th>What's Inside</th><th>Example</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>courses.csv</strong></td>
+        <td>40+ graduation courses with skills taught and description</td>
+        <td>Machine Learning, Data Science, Web Development...</td>
+      </tr>
+      <tr>
+        <td><strong>careers.csv</strong></td>
+        <td>30+ career paths with salary, job growth, and required skills</td>
+        <td>Data Scientist — ₹12L/yr — Very High growth</td>
+      </tr>
+      <tr>
+        <td><strong>fields.csv</strong></td>
+        <td>8 academic fields and what careers they lead to</td>
+        <td>Computer Science, Business, Healthcare, Arts...</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="highlight-box">
+    📝 <strong>You can add more data!</strong> These files are just spreadsheets. Open them in Excel or Notepad, add a new row following the same format, and the app will automatically include your new course or career next time it starts.
+  </div>
+
+
+  <!-- PRIVACY -->
+  <div class="section-title">🔒 Privacy — Is My Data Safe?</div>
+
+  <div class="card green">
+    <h3>Yes — nothing leaves your laptop. Ever.</h3>
+    <p>Unlike apps like ChatGPT or Google, Career Compass AI does NOT send your messages to any server on the internet. Everything happens locally: the AI thinks on your CPU, the data is on your hard drive, and the replies stay on your screen. No company can see your conversations.</p>
+  </div>
+
+  <div class="fact-grid">
+    <div class="fact-box">
+      <div class="fact-icon">📤</div>
+      <div class="fact-num fact-num-red">0</div>
+      <div class="fact-label">Data sent to internet</div>
+    </div>
+    <div class="fact-box">
+      <div class="fact-icon">🔑</div>
+      <div class="fact-num fact-num-green">0</div>
+      <div class="fact-label">API keys needed</div>
+    </div>
+    <div class="fact-box">
+      <div class="fact-icon">👤</div>
+      <div class="fact-num fact-num-green">0</div>
+      <div class="fact-label">Accounts required</div>
+    </div>
+    <div class="fact-box">
+      <div class="fact-icon">☁️</div>
+      <div class="fact-num fact-num-red">0</div>
+      <div class="fact-label">Cloud storage used</div>
+    </div>
+  </div>
+
+
+  <!-- TECHNOLOGY SUMMARY -->
+  <div class="section-title">🛠️ Technologies Used</div>
+  <p class="section-intro">Here are the tools that make Career Compass AI work:</p>
+
+  <table>
+    <thead>
+      <tr><th>Technology</th><th>What It Is</th><th>What It Does in This App</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Python</strong></td><td>A popular programming language</td><td>Runs the entire backend of the app</td></tr>
+      <tr><td><strong>Flask</strong></td><td>A Python web framework</td><td>Creates the website you see in the browser</td></tr>
+      <tr><td><strong>Ollama</strong></td><td>A free tool to run AI models locally</td><td>Loads and runs the Llama AI on your laptop</td></tr>
+      <tr><td><strong>Llama 3.2</strong></td><td>An AI language model by Meta</td><td>Understands your messages and writes replies</td></tr>
+      <tr><td><strong>CSV Files</strong></td><td>Simple spreadsheet format</td><td>Stores all course and career data</td></tr>
+      <tr><td><strong>HTML / CSS / JS</strong></td><td>Web page languages</td><td>Makes the chat interface look good and work</td></tr>
+    </tbody>
+  </table>
+
+
+  <!-- QUIZ -->
+  <div class="section-title">✅ Quick Quiz — Test Your Understanding</div>
+  <p class="section-intro">Let's see if you understood how the app works! Click "Show Answer" to reveal each answer.</p>
+
+  <div class="quiz-box">
+    <h4>🧠 Answer these questions:</h4>
+
+    <div class="quiz-q">
+      <p>Q1. What does Flask do in this app?</p>
+      <details><summary class="answer">Show Answer</summary>
+      Flask creates the website — the home page, chat page, and how-it-works page that you see in your browser.
+      </details>
+    </div>
+
+    <div class="quiz-q">
+      <p>Q2. Why doesn't the app need the internet after setup?</p>
+      <details><summary class="answer">Show Answer</summary>
+      Because the AI model (Llama 3.2) is downloaded to your laptop during setup. After that, everything runs locally — the AI, the data, and the website.
+      </details>
+    </div>
+
+    <div class="quiz-q">
+      <p>Q3. How does the app decide which career matches you?</p>
+      <details><summary class="answer">Show Answer</summary>
+      It counts how many of your interests appear in each career's required skills list. The career with the most matches gets the highest score and is recommended first.
+      </details>
+    </div>
+
+    <div class="quiz-q">
+      <p>Q4. What is Ollama?</p>
+      <details><summary class="answer">Show Answer</summary>
+      Ollama is a free tool that downloads and runs AI language models locally on your laptop — without needing the internet or a paid subscription.
+      </details>
+    </div>
+
+    <div class="quiz-q">
+      <p>Q5. Can you add new careers to the app? How?</p>
+      <details><summary class="answer">Show Answer</summary>
+      Yes! Open the data/careers.csv file in Excel or Notepad, add a new row following the same column format, save the file, and restart the app.
+      </details>
+    </div>
+  </div>
+
+
+  <!-- GLOSSARY -->
+  <div class="section-title">📖 Glossary — Key Words Explained</div>
+
+  <div class="glossary">
+    <div class="gloss-item">
+      <div class="gloss-term">AI (Artificial Intelligence)</div>
+      <div class="gloss-def">Computer programs that can do tasks that normally require human intelligence, like understanding language or making decisions.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term">Language Model</div>
+      <div class="gloss-def">A type of AI trained on huge amounts of text. It learns patterns in language and can generate human-like responses to questions.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term">Flask</div>
+      <div class="gloss-def">A Python library used to build websites and web applications. It handles the connection between your browser and the Python code running on your laptop.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term">Ollama</div>
+      <div class="gloss-def">A free, open-source tool that lets you run large AI models locally on your own computer without needing the internet or paying for API access.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term">Llama 3.2</div>
+      <div class="gloss-def">An AI language model created by Meta (Facebook's parent company) and released for free. The "3B" version has 3 billion parameters and runs on regular laptops.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term">CSV File</div>
+      <div class="gloss-def">A simple spreadsheet file (Comma Separated Values). Each line is a row of data, with columns separated by commas. Can be opened in Excel.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term">Localhost</div>
+      <div class="gloss-def">A special address (http://localhost:5000) that means "this computer". When you visit this address, you're connecting to a server running on your own laptop.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term">Recommendation Engine</div>
+      <div class="gloss-def">The part of the app that matches your interests with careers by comparing and scoring them. Similar to how Netflix recommends movies based on what you've watched.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term">Parameters (in AI)</div>
+      <div class="gloss-def">Numbers inside an AI model that were adjusted during training. More parameters generally means a smarter model. Llama 3.2 3B has 3 billion parameters.</div>
+    </div>
+  </div>
+
+
+  <!-- SUMMARY -->
+  <div class="section-title">🌟 Summary</div>
+
+  <div class="highlight-box">
+    <strong>In one sentence:</strong> Career Compass AI is an offline chat application that uses a local AI model (Llama 3.2) and a career database (CSV files) to recommend personalized graduation courses and career paths based on your interests — all running privately on your own laptop using Python and Flask.
+  </div>
+
+  <div class="card green" style="margin-top:16px;">
+    <h3>🚀 What makes this app special?</h3>
+    <p>
+      Most AI tools like ChatGPT send your data to a server in another country. This app runs <strong>everything on your own laptop</strong> — your conversations are private, it works without internet, and it costs nothing to run after setup. That's the power of open-source AI combined with thoughtful software design.
+    </p>
+  </div>
+
+</div>
+
+<footer>
+  <strong>Career Compass AI</strong> — Offline Career Counselor for Graduation Course Recommendations<br>
+  <span style="font-size:0.8rem; margin-top:6px; display:block;">Document prepared for Grade 9 students | All concepts explained in plain language</span>
+</footer>
+
+</body>
+</html>
